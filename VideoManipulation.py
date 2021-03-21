@@ -34,6 +34,13 @@ def gaussianBlur(frame):
 def canny(frame):
     return cv2.Canny(frame, 100, 200)
 
+def sobel(frame):
+    frame = grayScale(frame)
+    return cv2.Sobel(frame, cv2.CV_64F, 1, 0, ksize=5)
+
+def grayScale(frame):
+    return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
 def applyFilter(pressedKey, firstFrame, secondFrame):
     if pressedKey == 'c':
         return firstFrame
@@ -58,7 +65,7 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
     elif pressedKey == 'r':
         return secondFrame
     elif pressedKey == 's':
-        return secondFrame
+        return sobel(firstFrame)
     elif pressedKey == 't':
         return secondFrame
     elif pressedKey == 'v':
