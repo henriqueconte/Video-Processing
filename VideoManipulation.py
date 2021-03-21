@@ -56,6 +56,9 @@ def increaseBrightness(frame):
 def resize(frame):
     return cv2.resize(frame, (int(afterVideo.get(3) / 2), int(afterVideo.get(4) / 2)), fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
 
+def rotate(frame):
+    return cv2.rotate(frame, cv2.cv2.ROTATE_90_CLOCKWISE)
+
 def applyFilter(pressedKey, firstFrame, secondFrame):
     if pressedKey == 'c':
         return firstFrame
@@ -82,7 +85,7 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
     elif pressedKey == 's':
         return sobel(firstFrame)
     elif pressedKey == 't':
-        return secondFrame
+        return rotate(secondFrame)
     elif pressedKey == 'v':
         return secondFrame
     elif pressedKey == 'z':
