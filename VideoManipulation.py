@@ -31,13 +31,16 @@ def presentTrackbar():
 def gaussianBlur(frame):
     return cv2.GaussianBlur(frame, (5,5), 10)
 
+def canny(frame):
+    return cv2.Canny(frame, 100, 200)
+
 def applyFilter(pressedKey, firstFrame, secondFrame):
     if pressedKey == 'c':
         return firstFrame
     elif pressedKey == 'b':
-        return gaussianBlur(secondFrame)
+        return gaussianBlur(firstFrame)
     elif pressedKey == 'e':
-        return secondFrame
+        return canny(firstFrame)
     elif pressedKey == 'f':
         return secondFrame
     elif pressedKey == '+':
