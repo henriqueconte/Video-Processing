@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import keyboard
 
 def printInstructions():
     print('B or b: Blurring (Gaussian)')
@@ -17,26 +18,111 @@ def printInstructions():
     print('V or v: toggle Video recording')
     print('Z or z: toggle resize frame to 1/4 of the original size')
 
+def nothing(x):
+    print(x)
+
+def presentTrackbar():
+    emptyWindow = np.zeros((300, 512, 3), np.uint8)
+    cv2.namedWindow('After - controls')
+    cv2.createTrackbar('Value', 'After - controls', 0, 30, nothing)    
+    cv2.imshow('After - controls', emptyWindow)
+
+
+def gaussianBlur(frame):
+    return cv2.GaussianBlur(frame, (5,5), 10)
+
+def applyFilter(pressedKey, firstFrame, secondFrame):
+    if pressedKey == 'c':
+        return firstFrame
+    elif pressedKey == 'b':
+        return gaussianBlur(secondFrame)
+    elif pressedKey == 'e':
+        return secondFrame
+    elif pressedKey == 'f':
+        return secondFrame
+    elif pressedKey == '+':
+        return secondFrame
+    elif pressedKey == '-':
+        return secondFrame
+    elif pressedKey == 'g':
+        return secondFrame
+    elif pressedKey == 'h':
+        return secondFrame
+    elif pressedKey == 'n':
+        return secondFrame
+    elif pressedKey == 'o':
+        return secondFrame
+    elif pressedKey == 'r':
+        return secondFrame
+    elif pressedKey == 's':
+        return secondFrame
+    elif pressedKey == 't':
+        return secondFrame
+    elif pressedKey == 'v':
+        return secondFrame
+    elif pressedKey == 'z':
+        return secondFrame
+    else: 
+        return secondFrame
+
 printInstructions()
+# presentTrackbar()
 
 beforeVideo = cv2.VideoCapture(0)
 afterVideo = cv2.VideoCapture(0)
+pressedKey = 'c'
 
 while True:
     retBefore, frameBefore = beforeVideo.read()
     retAfter, frameAfter = afterVideo.read()
     
+    # Sets frame size from windows
     retBefore = beforeVideo.set(3, 320)
     retBefore = beforeVideo.set(4, 240)
     # frameBefore = cv2.cvtColor(frameBefore,cv2.COLOR_BGR2RGB)
     # frameAfter = cv2.cvtColor(frameAfter,cv2.COLOR_BGR2RGB)
 
-    cv2.imshow("Before",frameBefore)
-    cv2.imshow("After",frameAfter)
+    frameAfter = applyFilter(pressedKey, frameBefore, frameAfter)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+    if keyboard.is_pressed('b'):
+        pressedKey = 'b'
+    elif keyboard.is_pressed('c'):
+        pressedKey = 'c'
+    elif keyboard.is_pressed('e'):
+        pressedKey = 'e'
+    elif keyboard.is_pressed('f'):
+        pressedKey = 'f'
+    elif keyboard.is_pressed('+'):
+        pressedKey = '+'
+    elif keyboard.is_pressed('-'):
+        pressedKey = '-'
+    elif keyboard.is_pressed('g'):
+        pressedKey = 'g'
+    elif keyboard.is_pressed('h'):
+        pressedKey = 'h'
+    elif keyboard.is_pressed('n'):
+        pressedKey = 'n'
+    elif keyboard.is_pressed('o'):
+        pressedKey = 'o'
+    elif keyboard.is_pressed('r'):
+        pressedKey = 'r'
+    elif keyboard.is_pressed('s'):
+        pressedKey = 's'
+    elif keyboard.is_pressed('t'):
+        pressedKey = 't'
+    elif keyboard.is_pressed('v'):
+        pressedKey = 'v'
+    elif keyboard.is_pressed('z'):
+        pressedKey = 'z'
+
+    # Show before and after videos
+    cv2.imshow("Before",frameBefore)
+    cv2.imshow('After',frameAfter)
+
 beforeVideo.release()
 afterVideo.release()
 cv2.destroyAllWindows()
+
