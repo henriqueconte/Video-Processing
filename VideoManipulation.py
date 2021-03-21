@@ -3,6 +3,7 @@ import numpy as np
 import keyboard
 
 def printInstructions():
+    print('Q or q: quit')
     print('B or b: Blurring (Gaussian)')
     print('C or c: Color (no processing)')
     print('E or e: Edges (Canny)')
@@ -45,7 +46,7 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
     if pressedKey == 'c':
         return firstFrame
     elif pressedKey == 'b':
-        return gaussianBlur(firstFrame)
+        return gaussianBlur(secondFrame)
     elif pressedKey == 'e':
         return canny(firstFrame)
     elif pressedKey == 'f':
@@ -55,7 +56,7 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
     elif pressedKey == '-':
         return secondFrame
     elif pressedKey == 'g':
-        return secondFrame
+        return grayScale(secondFrame)
     elif pressedKey == 'h':
         return secondFrame
     elif pressedKey == 'n':
@@ -97,7 +98,9 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    if keyboard.is_pressed('b'):
+    if keyboard.is_pressed('q'):
+        break
+    elif keyboard.is_pressed('b'):
         pressedKey = 'b'
     elif keyboard.is_pressed('c'):
         pressedKey = 'c'
