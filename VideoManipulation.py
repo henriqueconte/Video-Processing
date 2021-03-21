@@ -7,10 +7,10 @@ def printInstructions():
     print('B or b: Blurring (Gaussian)')
     print('C or c: Color (no processing)')
     print('E or e: Edges (Canny)')
-    print('F or f: Flip the video')
-    print('+ or -: Increment/Decrement Flip mode: mode = 0 (default): Vertical; mode > 0: Horizontal; mode < 0: Vert & Horiz.')
+    print('1: Flip the video horizontally')
+    print('2: Flip the video vertically')
+    print('3: Flip the video both horizontal and vertically')
     print('G or g: Grayscale')
-    print('H or h: Help')
     print('N or n: Negative')
     print('O or o: Contrast enhancement')
     print('R or r: brightness enhancement')
@@ -59,6 +59,9 @@ def resize(frame):
 def rotate(frame):
     return cv2.rotate(frame, cv2.cv2.ROTATE_90_CLOCKWISE)
 
+def flip(frame, flipMode):
+    return cv2.flip(frame, int(flipMode))
+    
 def applyFilter(pressedKey, firstFrame, secondFrame):
     if pressedKey == 'c':
         return firstFrame
@@ -66,12 +69,12 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
         return gaussianBlur(secondFrame)
     elif pressedKey == 'e':
         return canny(firstFrame)
-    elif pressedKey == 'f':
-        return secondFrame
-    elif pressedKey == '+':
-        return secondFrame
-    elif pressedKey == '-':
-        return secondFrame
+    elif pressedKey == '1':
+        return flip(secondFrame, '1')
+    elif pressedKey == '2':
+        return flip(secondFrame, '0')
+    elif pressedKey == '3':
+        return flip(secondFrame, '-1')
     elif pressedKey == 'g':
         return grayScale(secondFrame)
     elif pressedKey == 'h':
@@ -99,6 +102,7 @@ printInstructions()
 beforeVideo = cv2.VideoCapture(0)
 afterVideo = cv2.VideoCapture(0)
 pressedKey = 'c'
+appliedFilters = []
 
 while True:
     retBefore, frameBefore = beforeVideo.read()
@@ -110,7 +114,8 @@ while True:
     # frameBefore = cv2.cvtColor(frameBefore,cv2.COLOR_BGR2RGB)
     # frameAfter = cv2.cvtColor(frameAfter,cv2.COLOR_BGR2RGB)
 
-    frameAfter = applyFilter(pressedKey, frameBefore, frameAfter)
+    for currentFilter in appliedFilters:
+        frameAfter = applyFilter(currentFilter, frameBefore, frameAfter)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
@@ -118,34 +123,53 @@ while True:
     if keyboard.is_pressed('q'):
         break
     elif keyboard.is_pressed('b'):
+        appliedFilters.append('b')
         pressedKey = 'b'
     elif keyboard.is_pressed('c'):
+        appliedFilters = []
         pressedKey = 'c'
     elif keyboard.is_pressed('e'):
+        appliedFilters = []
+        appliedFilters.append('e')
         pressedKey = 'e'
     elif keyboard.is_pressed('f'):
+        appliedFilters.append('f')
         pressedKey = 'f'
-    elif keyboard.is_pressed('+'):
-        pressedKey = '+'
-    elif keyboard.is_pressed('-'):
-        pressedKey = '-'
+    elif keyboard.is_pressed('1'):
+        appliedFilters.append('1')
+        pressedKey = '1'
+    elif keyboard.is_pressed('2'):
+        appliedFilters.append('2')
+        pressedKey = '2'
+    elif keyboard.is_pressed('3'):
+        appliedFilters.append('3')
+        pressedKey = '3'
     elif keyboard.is_pressed('g'):
+        appliedFilters.append('g')
         pressedKey = 'g'
     elif keyboard.is_pressed('h'):
         pressedKey = 'h'
     elif keyboard.is_pressed('n'):
+        appliedFilters = []
+        appliedFilters.append('n')
         pressedKey = 'n'
     elif keyboard.is_pressed('o'):
+        appliedFilters.append('o')
         pressedKey = 'o'
     elif keyboard.is_pressed('r'):
+        appliedFilters.append('r')
         pressedKey = 'r'
     elif keyboard.is_pressed('s'):
+        appliedFilters = []
+        appliedFilters.append('s')
         pressedKey = 's'
     elif keyboard.is_pressed('t'):
+        appliedFilters.append('t')
         pressedKey = 't'
     elif keyboard.is_pressed('v'):
         pressedKey = 'v'
     elif keyboard.is_pressed('z'):
+        appliedFilters.append('z')
         pressedKey = 'z'
 
     # Show before and after videos
