@@ -37,10 +37,24 @@ def canny(frame):
 
 def sobel(frame):
     frame = grayScale(frame)
-    return cv2.Sobel(frame, cv2.CV_64F, 1, 0, ksize=5)
+    return cv2.Sobel(frame, cv2.CV_8U, 1, 0, ksize=5)
 
 def grayScale(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+def increaseBrightness(frame):
+    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # h,s,v = cv2.split(hsv)
+    # v += 50
+    # final_hsv = cv2.merge((h,s,v))
+    # frame = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    
+    # Possibilidade: https://docs.opencv.org/3.4/d3/dc1/tutorial_basic_linear_transform.html
+
+    return frame
+
+def resize(frame):
+    return cv2.resize(frame, (int(afterVideo.get(3) / 2), int(afterVideo.get(4) / 2)), fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
 
 def applyFilter(pressedKey, firstFrame, secondFrame):
     if pressedKey == 'c':
@@ -64,7 +78,7 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
     elif pressedKey == 'o':
         return secondFrame
     elif pressedKey == 'r':
-        return secondFrame
+        return increaseBrightness(secondFrame)
     elif pressedKey == 's':
         return sobel(firstFrame)
     elif pressedKey == 't':
@@ -72,7 +86,7 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
     elif pressedKey == 'v':
         return secondFrame
     elif pressedKey == 'z':
-        return secondFrame
+        return resize(secondFrame)
     else: 
         return secondFrame
 
