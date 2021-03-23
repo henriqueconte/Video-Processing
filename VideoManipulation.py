@@ -85,8 +85,6 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
         return sobel(firstFrame)
     elif pressedKey == 't':
         return rotate(secondFrame)
-    elif pressedKey == 'v':
-        return secondFrame
     elif pressedKey == 'z':
         return resize(secondFrame)
     else: 
