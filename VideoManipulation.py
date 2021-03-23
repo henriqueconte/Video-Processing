@@ -10,8 +10,9 @@ def printInstructions():
     print('5: Increase brightness')
     print('6: Decrease contrast')
     print('7: Increase contrast')
+    print('8: Decrease blurring')
+    print('9: Increase blurring')
     print('Q or q: quit')
-    print('B or b: Blurring (Gaussian)')
     print('C or c: Color (no processing)')
     print('E or e: Edges (Canny)')
     print('G or g: Grayscale')
@@ -23,7 +24,7 @@ def printInstructions():
 
 
 def gaussianBlur(frame):
-    return cv2.GaussianBlur(frame, (5,5), 10)
+    return cv2.GaussianBlur(frame, (5,5), 20)
 
 def canny(frame):
     return cv2.Canny(frame, 100, 200)
@@ -71,10 +72,10 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
         return changeContrast(firstFrame)
     elif pressedKey == '7':
         return changeContrast(firstFrame)
+    elif pressedKey == '9':
+        return gaussianBlur(secondFrame)
     elif pressedKey == 'c':
         return firstFrame
-    elif pressedKey == 'b':
-        return gaussianBlur(secondFrame)
     elif pressedKey == 'e':
         return canny(firstFrame)
     elif pressedKey == 'g':
@@ -104,7 +105,6 @@ appliedFilters = []
 brightnessCount = 0
 contrastCount = 0
 
-
 while True:
     retBefore, frameBefore = beforeVideo.read()
     retAfter, frameAfter = afterVideo.read()
@@ -125,9 +125,6 @@ while True:
         break
     if keyboard.is_pressed('q'):
         break
-    elif keyboard.is_pressed('b'):
-        appliedFilters.append('b')
-        pressedKey = 'b'
     elif keyboard.is_pressed('c'):
         appliedFilters = []
         brightnessCount = 0
@@ -165,6 +162,13 @@ while True:
         appliedFilters.append('7')
         pressedKey = '7'
         contrastCount += 1
+    elif keyboard.is_pressed('8'):
+        if '9' in appliedFilters:
+            appliedFilters.remove('9')
+        pressedKey = '8'
+    elif keyboard.is_pressed('9'):
+        appliedFilters.append('9')
+        pressedKey = '9'
     elif keyboard.is_pressed('g'):
         appliedFilters = []
         appliedFilters.append('g')
