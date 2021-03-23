@@ -37,23 +37,14 @@ def grayScale(frame):
 
 def changeBrightness(frame):
     frame = cv2.convertScaleAbs(frame, alpha=1, beta=10 * brightnessCount)
-    # frame = cv2.add(frame, 10 * brightnessCount)
-    # frame = [0 if value < 0 else value for value in frame]
-    # frame[frame < 0]
-    # frame = np.add(frame, 10 * brightnessCount)
     return frame
-
-# def increaseBrightness(frame):
-#     frame = cv2.convertScaleAbs(frame, alpha=1, beta=10 * brightnessCount)
-#     return frame
-
-# def decreaseContrast(frame):
-#     frame = cv2.convertScaleAbs(frame, alpha=1 + (contrastCount * 0.1), beta=0)
-#     return frame
 
 def changeContrast(frame):
     frame = cv2.convertScaleAbs(frame, alpha=1 + (contrastCount * 0.1), beta=0)
-    # frame = np.clip(frame, 0, 255)
+    return frame
+
+def negative(frame):
+    frame = 255 - frame
     return frame
 
 def resize(frame):
@@ -89,7 +80,7 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
     elif pressedKey == 'g':
         return grayScale(secondFrame)
     elif pressedKey == 'n':
-        return secondFrame
+        return negative(secondFrame)
     elif pressedKey == 's':
         return sobel(firstFrame)
     elif pressedKey == 't':
@@ -181,7 +172,6 @@ while True:
         appliedFilters.append('g')
         pressedKey = 'g'
     elif keyboard.is_pressed('n'):
-        appliedFilters = []
         appliedFilters.append('n')
         pressedKey = 'n'
     elif keyboard.is_pressed('s'):
