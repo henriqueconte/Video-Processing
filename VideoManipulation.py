@@ -6,15 +6,16 @@ def printInstructions():
     print('1: Flip the video horizontally')
     print('2: Flip the video vertically')
     print('3: Flip the video both horizontal and vertically')
-    print('4: reduce brightness')
-    print('5: increase brightness')
+    print('4: Decrease brightness')
+    print('5: Increase brightness')
+    print('6: Decrease contrast')
+    print('7: Increase contrast')
     print('Q or q: quit')
     print('B or b: Blurring (Gaussian)')
     print('C or c: Color (no processing)')
     print('E or e: Edges (Canny)')
     print('G or g: Grayscale')
     print('N or n: Negative')
-    print('O or o: Contrast enhancement')
     print('S or s: Gradient (Sobel)')
     print('T or t: rotate the video frames')
     print('V or v: toggle Video recording')
@@ -34,12 +35,25 @@ def sobel(frame):
 def grayScale(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-def decreaseBrightness(frame):
-    frame = cv2.convertScaleAbs(frame, alpha=1, beta=-10)
+def changeBrightness(frame):
+    frame = cv2.convertScaleAbs(frame, alpha=1, beta=10 * brightnessCount)
+    # frame = cv2.add(frame, 10 * brightnessCount)
+    # frame = [0 if value < 0 else value for value in frame]
+    # frame[frame < 0]
+    # frame = np.add(frame, 10 * brightnessCount)
     return frame
 
-def increaseBrightness(frame):
-    frame = cv2.convertScaleAbs(frame, alpha=1, beta=10)
+# def increaseBrightness(frame):
+#     frame = cv2.convertScaleAbs(frame, alpha=1, beta=10 * brightnessCount)
+#     return frame
+
+# def decreaseContrast(frame):
+#     frame = cv2.convertScaleAbs(frame, alpha=1 + (contrastCount * 0.1), beta=0)
+#     return frame
+
+def changeContrast(frame):
+    frame = cv2.convertScaleAbs(frame, alpha=1 + (contrastCount * 0.1), beta=0)
+    # frame = np.clip(frame, 0, 255)
     return frame
 
 def resize(frame):
@@ -52,30 +66,30 @@ def flip(frame, flipMode):
     return cv2.flip(frame, int(flipMode))
 
 def applyFilter(pressedKey, firstFrame, secondFrame):
-    if pressedKey == 'c':
-        return firstFrame
-    elif pressedKey == 'b':
-        return gaussianBlur(secondFrame)
-    elif pressedKey == 'e':
-        return canny(firstFrame)
-    elif pressedKey == '1':
+    if pressedKey == '1':
         return flip(secondFrame, '1')
     elif pressedKey == '2':
         return flip(secondFrame, '0')
     elif pressedKey == '3':
         return flip(secondFrame, '-1')
+    elif pressedKey == '4':
+        return changeBrightness(firstFrame)
+    elif pressedKey == '5':
+        return changeBrightness(firstFrame)
+    elif pressedKey == '6':
+        return changeContrast(firstFrame)
+    elif pressedKey == '7':
+        return changeContrast(firstFrame)
+    elif pressedKey == 'c':
+        return firstFrame
+    elif pressedKey == 'b':
+        return gaussianBlur(secondFrame)
+    elif pressedKey == 'e':
+        return canny(firstFrame)
     elif pressedKey == 'g':
         return grayScale(secondFrame)
-    elif pressedKey == 'h':
-        return secondFrame
     elif pressedKey == 'n':
         return secondFrame
-    elif pressedKey == 'o':
-        return secondFrame
-    elif pressedKey == '4':
-        return decreaseBrightness(secondFrame)
-    elif pressedKey == '5':
-        return increaseBrightness(secondFrame)
     elif pressedKey == 's':
         return sobel(firstFrame)
     elif pressedKey == 't':
@@ -98,6 +112,9 @@ videoWriter = cv2.VideoWriter('video_demo.mov',cv2.VideoWriter_fourcc('m', 'p', 
 pressedKey = 'c'
 isRecording = False
 appliedFilters = []
+brightnessCount = 0
+contrastCount = 0
+
 
 while True:
     retBefore, frameBefore = beforeVideo.read()
@@ -124,6 +141,8 @@ while True:
         pressedKey = 'b'
     elif keyboard.is_pressed('c'):
         appliedFilters = []
+        brightnessCount = 0
+        contrastCount = 0
         pressedKey = 'c'
     elif keyboard.is_pressed('e'):
         appliedFilters = []
@@ -144,22 +163,27 @@ while True:
     elif keyboard.is_pressed('4'):
         appliedFilters.append('4')
         pressedKey = '4'
+        brightnessCount -= 1
     elif keyboard.is_pressed('5'):
         appliedFilters.append('5')
         pressedKey = '5'
+        brightnessCount += 1
+    elif keyboard.is_pressed('6'):
+        appliedFilters.append('6')
+        pressedKey = '6'
+        contrastCount -= 1
+    elif keyboard.is_pressed('7'):
+        appliedFilters.append('7')
+        pressedKey = '7'
+        contrastCount += 1
     elif keyboard.is_pressed('g'):
         appliedFilters = []
         appliedFilters.append('g')
         pressedKey = 'g'
-    elif keyboard.is_pressed('h'):
-        pressedKey = 'h'
     elif keyboard.is_pressed('n'):
         appliedFilters = []
         appliedFilters.append('n')
         pressedKey = 'n'
-    elif keyboard.is_pressed('o'):
-        appliedFilters.append('o')
-        pressedKey = 'o'
     elif keyboard.is_pressed('s'):
         appliedFilters = []
         appliedFilters.append('s')
