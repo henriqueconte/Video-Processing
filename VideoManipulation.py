@@ -3,30 +3,22 @@ import numpy as np
 import keyboard
 
 def printInstructions():
+    print('1: Flip the video horizontally')
+    print('2: Flip the video vertically')
+    print('3: Flip the video both horizontal and vertically')
+    print('4: reduce brightness')
+    print('5: increase brightness')
     print('Q or q: quit')
     print('B or b: Blurring (Gaussian)')
     print('C or c: Color (no processing)')
     print('E or e: Edges (Canny)')
-    print('1: Flip the video horizontally')
-    print('2: Flip the video vertically')
-    print('3: Flip the video both horizontal and vertically')
     print('G or g: Grayscale')
     print('N or n: Negative')
     print('O or o: Contrast enhancement')
-    print('R or r: brightness enhancement')
     print('S or s: Gradient (Sobel)')
     print('T or t: rotate the video frames')
     print('V or v: toggle Video recording')
     print('Z or z: toggle resize frame to 1/4 of the original size')
-
-def nothing(x):
-    print(x)
-
-def presentTrackbar():
-    emptyWindow = np.zeros((300, 512, 3), np.uint8)
-    cv2.namedWindow('After - controls')
-    cv2.createTrackbar('Value', 'After - controls', 0, 30, nothing)    
-    cv2.imshow('After - controls', emptyWindow)
 
 
 def gaussianBlur(frame):
@@ -42,15 +34,12 @@ def sobel(frame):
 def grayScale(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-def increaseBrightness(frame):
-    # hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    # h,s,v = cv2.split(hsv)
-    # v += 50
-    # final_hsv = cv2.merge((h,s,v))
-    # frame = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
-    
-    # Possibilidade: https://docs.opencv.org/3.4/d3/dc1/tutorial_basic_linear_transform.html
+def decreaseBrightness(frame):
+    frame = cv2.convertScaleAbs(frame, alpha=1, beta=-10)
+    return frame
 
+def increaseBrightness(frame):
+    frame = cv2.convertScaleAbs(frame, alpha=1, beta=10)
     return frame
 
 def resize(frame):
@@ -61,7 +50,7 @@ def rotate(frame):
 
 def flip(frame, flipMode):
     return cv2.flip(frame, int(flipMode))
-    
+
 def applyFilter(pressedKey, firstFrame, secondFrame):
     if pressedKey == 'c':
         return firstFrame
@@ -83,7 +72,9 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
         return secondFrame
     elif pressedKey == 'o':
         return secondFrame
-    elif pressedKey == 'r':
+    elif pressedKey == '4':
+        return decreaseBrightness(secondFrame)
+    elif pressedKey == '5':
         return increaseBrightness(secondFrame)
     elif pressedKey == 's':
         return sobel(firstFrame)
@@ -97,11 +88,15 @@ def applyFilter(pressedKey, firstFrame, secondFrame):
         return secondFrame
 
 printInstructions()
-# presentTrackbar()
 
 beforeVideo = cv2.VideoCapture(0)
 afterVideo = cv2.VideoCapture(0)
+width = int(afterVideo.get(cv2.CAP_PROP_FRAME_WIDTH) + 0.5)
+height = int(afterVideo.get(cv2.CAP_PROP_FRAME_HEIGHT) + 0.5)
+size = (width, height)
+videoWriter = cv2.VideoWriter('video_demo.mov',cv2.VideoWriter_fourcc('m', 'p', '4', 'v'), 10.0, size)
 pressedKey = 'c'
+isRecording = False
 appliedFilters = []
 
 while True:
@@ -109,17 +104,19 @@ while True:
     retAfter, frameAfter = afterVideo.read()
     
     # Sets frame size from windows
-    retBefore = beforeVideo.set(3, 320)
-    retBefore = beforeVideo.set(4, 240)
-    # frameBefore = cv2.cvtColor(frameBefore,cv2.COLOR_BGR2RGB)
-    # frameAfter = cv2.cvtColor(frameAfter,cv2.COLOR_BGR2RGB)
+    retBefore = beforeVideo.set(3, size[0])
+    retBefore = beforeVideo.set(4, size[1])
+    retAfter = afterVideo.set(3, size[0])
+    retAfter = afterVideo.set(4, size[1])
 
     for currentFilter in appliedFilters:
         frameAfter = applyFilter(currentFilter, frameBefore, frameAfter)
 
+    if isRecording:
+        videoWriter.write(frameAfter)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
     if keyboard.is_pressed('q'):
         break
     elif keyboard.is_pressed('b'):
@@ -144,7 +141,14 @@ while True:
     elif keyboard.is_pressed('3'):
         appliedFilters.append('3')
         pressedKey = '3'
+    elif keyboard.is_pressed('4'):
+        appliedFilters.append('4')
+        pressedKey = '4'
+    elif keyboard.is_pressed('5'):
+        appliedFilters.append('5')
+        pressedKey = '5'
     elif keyboard.is_pressed('g'):
+        appliedFilters = []
         appliedFilters.append('g')
         pressedKey = 'g'
     elif keyboard.is_pressed('h'):
@@ -156,9 +160,6 @@ while True:
     elif keyboard.is_pressed('o'):
         appliedFilters.append('o')
         pressedKey = 'o'
-    elif keyboard.is_pressed('r'):
-        appliedFilters.append('r')
-        pressedKey = 'r'
     elif keyboard.is_pressed('s'):
         appliedFilters = []
         appliedFilters.append('s')
@@ -167,7 +168,7 @@ while True:
         appliedFilters.append('t')
         pressedKey = 't'
     elif keyboard.is_pressed('v'):
-        pressedKey = 'v'
+        isRecording = not isRecording
     elif keyboard.is_pressed('z'):
         appliedFilters.append('z')
         pressedKey = 'z'
@@ -176,6 +177,7 @@ while True:
     cv2.imshow("Before",frameBefore)
     cv2.imshow('After',frameAfter)
 
+videoWriter.release()
 beforeVideo.release()
 afterVideo.release()
 cv2.destroyAllWindows()
